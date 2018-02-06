@@ -89,7 +89,7 @@ router.put('/notes/:id', (req, res, next) => {
 /* ========== POST/CREATE ITEM ========== */
 router.post('/notes', (req, res, next) => {
   const { title, content } = req.body;
-  
+
   const newItem = { title, content };
   /***** Never trust users - validate input *****/
   if (!newItem.title) {
@@ -98,22 +98,23 @@ router.post('/notes', (req, res, next) => {
     return next(err);
   }
 
- 
-    // .then(item => {
-    //   if (item) {
-    //     res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
-    //   } 
-    // })
-    // .catch(err => next(err));
-  
+  knex('notes')
+    .insert(newItem)
+    .then(item => {
+      if (item) {
+        res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
+      }
+    })
+    .catch(err => next(err));
+
 });
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/notes/:id', (req, res, next) => {
   const id = req.params.id;
-  
-  /*
-  notes.delete(id)
+
+  knex('notes').where('id', `${id}`)
+    .del()
     .then(count => {
       if (count) {
         res.status(204).end();
@@ -122,7 +123,6 @@ router.delete('/notes/:id', (req, res, next) => {
       }
     })
     .catch(err => next(err));
-  */
 });
 
 module.exports = router;

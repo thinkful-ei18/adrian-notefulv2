@@ -39,6 +39,7 @@ const router = express.Router();
 //   .update(updateObj)
 //   .then(results => console.log(results));
 
+// POST A NOTE
 // const { title, content } = req.body;
 // const newItem = { title, content };
 // const newItem = {title: 'Cats are cool', content: 'Ice cold!' };
