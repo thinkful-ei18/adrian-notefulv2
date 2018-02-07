@@ -21,7 +21,7 @@ router.get('/notes', (req, res, next) => {
   const searchTerm = req.query.searchTerm ? req.query.searchTerm.toLowerCase() : null;
 
   if (searchTerm) {
-    knex.select('id', 'title', 'content')
+    knex.select('id', 'title', 'content', 'created')
       .from('notes')
       .where('title', 'like', `%${searchTerm}%`)
       .orWhere('content', 'like', `%${searchTerm}%`)
@@ -30,7 +30,7 @@ router.get('/notes', (req, res, next) => {
       })
       .catch(err => next(err));
   } else {
-    knex.select('id', 'title', 'content').from('notes')
+    knex.select('id', 'title', 'content', 'created').from('notes')
       .then(list => {
         res.json(list);
       })
@@ -42,11 +42,11 @@ router.get('/notes', (req, res, next) => {
 router.get('/notes/:id', (req, res, next) => {
   const noteId = req.params.id;
 
-  knex.first('id', 'title', 'content').from('notes')
+  knex.first('id', 'title', 'content', 'created').from('notes')
     .where('id', noteId)
-    .then(items => {
-      if (items) {
-        res.json(items);
+    .then(item => {
+      if (item) {
+        res.json(item);
       } else {
         next();
       }
