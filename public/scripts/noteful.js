@@ -16,6 +16,8 @@ const noteful = (function () {
 
     const folderSelect = generateFolderSelect(store.folders);
     $('.js-note-folder-entry').html(folderSelect);
+
+    editForm.find('.js-note-folder-entry').val(store.currentNote.folder_id);
   }
 
   /**
