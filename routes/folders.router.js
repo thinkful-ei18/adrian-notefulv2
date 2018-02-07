@@ -60,6 +60,25 @@ router.put('/folders/:id', (req, res, next) => {
     .catch(err => next(err));
 });
 
+router.post('/folders', (req, res, next) => {
+  const { name } = req.body;
+
+  const newFolder = { name };
+  /***** Never trust users - validate input *****/
+  if (!newFolder.name) {
+    const err = new Error('Missing `name` in request body');
+    err.status = 400;
+    return next(err);
+  }
+
+  knex('folders')
+    .insert(newFolder)
+    .returning(['id', 'name'])
+    .then(result => res.json(result))
+    .catch(err => next(err));
+});
+
+
 
 
 module.exports = router;
