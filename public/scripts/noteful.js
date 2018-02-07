@@ -155,6 +155,24 @@ const noteful = (function () {
     });
   }
 
+  function handleFolderClick() {
+    $('.js-folders-list').on('click', '.js-folder-link', event => {
+      event.preventDefault();
+
+      const folderId = getFolderIdFromElement(event.currentTarget);
+      store.currentQuery.folderId = folderId;
+      if (folderId !== store.currentNote.folder_id) {
+        store.currentNote = {};
+      }
+
+      api.search('/v2/notes', store.currentQuery)
+        .then(response => {
+          store.notes = response;
+          render();
+        });
+    });
+  }
+
   function bindEventListeners() {
     handleNoteItemClick();
     handleNoteSearchSubmit();
@@ -162,6 +180,7 @@ const noteful = (function () {
     handleNoteFormSubmit();
     handleNoteStartNewSubmit();
     handleNoteDeleteClick();
+    handleFolderClick();
   }
 
   // This object contains the only exposed methods from this module:
