@@ -63,6 +63,11 @@ const noteful = (function () {
     return id;
   }
 
+  function getFolderIdFromElement(item) {
+    const id = $(item).closest('.js-folder-item').data('id');
+    return id;
+  }
+
   /**
    * NOTES EVENT LISTENERS AND HANDLERS
    */
