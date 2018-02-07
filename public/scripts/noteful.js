@@ -173,6 +173,24 @@ const noteful = (function () {
     });
   }
 
+  function handleNewFolderSubmit() {
+    $('.js-new-folder-form').on('submit', event => {
+      event.preventDefault();
+
+      const newFolderName = $('.js-new-folder-entry').val();
+      api.create('/v2/folders', { name: newFolderName })
+        .then(() => {
+          $('.js-new-folder-entry').val();
+          return api.search('/v2/folders');
+        }).then(response => {
+          store.folders = response;
+          render();
+        }).catch(err => {
+          $('.js-error-message').text(err.responseJSON.message);
+        });
+    });
+  }
+
   function bindEventListeners() {
     handleNoteItemClick();
     handleNoteSearchSubmit();
@@ -181,6 +199,7 @@ const noteful = (function () {
     handleNoteStartNewSubmit();
     handleNoteDeleteClick();
     handleFolderClick();
+    handleNewFolderSubmit();
   }
 
   // This object contains the only exposed methods from this module:
