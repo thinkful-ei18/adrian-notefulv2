@@ -13,6 +13,9 @@ const noteful = (function () {
 
     const folderList = generateFolderList(store.folders, store.currentQuery);
     $('.js-folders-list').html(folderList);
+
+    const folderSelect = generateFolderSelect(store.folders);
+    $('.js-note-folder-entry').html(folderSelect);
   }
 
   /**
@@ -35,6 +38,11 @@ const noteful = (function () {
       <li data-id="" class="js-folder-item ${!currQuery.folderId ? 'active' : ''}">
         <a href="#" class="name js-folder-link">All</a>
       </li>`;
+
+    function generateFolderSelect(list) {
+      const notes = list.map(item => `<option value="${item.id}">${item.name}</option>`);
+      return '<option value="">Select Folder:</option>' + notes.join('');
+    }
 
     const listItems = list.map(item => `
       <li data-id="${item.id}" class="js-folder-item ${currQuery.folderId === item.id ? 'active' : ''}">
