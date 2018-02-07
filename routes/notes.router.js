@@ -8,7 +8,7 @@ const router = express.Router();
 const knex = require('../knex');
 
 // TEMP: Simple In-Memory Database
-/* 
+/*
 const data = require('../db/notes');
 const simDB = require('../db/simDB');
 const notes = simDB.initialize(data);
@@ -20,22 +20,21 @@ const notes = simDB.initialize(data);
 router.get('/notes', (req, res, next) => {
   const searchTerm = req.query.searchTerm ? req.query.searchTerm.toLowerCase() : null;
 
-  if (searchTerm) {
-    knex.select('id', 'title', 'content', 'created')
-      .from('notes')
-      .where('title', 'like', `%${searchTerm}%`)
-      .orWhere('content', 'like', `%${searchTerm}%`)
-      .then(list => {
-        res.json(list);
-      })
-      .catch(err => next(err));
-  } else {
-    knex.select('id', 'title', 'content', 'created').from('notes')
-      .then(list => {
-        res.json(list);
-      })
-      .catch(err => next(err));
-  }
+  knex.select('notes.id', 'title', 'content', 'folder_id', 'folders.name as folder_name')
+    .from('notes')
+    .leftJoin('folders', 'notes.folder_id', 'folders.id')
+    .where(function () {
+      if (searchTerm) {
+        this.where('title', 'like', `%${searchTerm}%`);
+      }
+    })
+    .orderBy('notes.id')
+    .then(results => {
+      res.json(results);
+    })
+    .catch(err => {
+      console.error(err);
+    });
 });
 
 /* ========== GET/READ SINGLE NOTES ========== */
