@@ -3,13 +3,16 @@
 
 const noteful = (function () {
 
-  function render() {    
+  function render() {
     const notesList = generateNotesList(store.notes, store.currentNote);
     $('.js-notes-list').html(notesList);
 
     const editForm = $('.js-note-edit-form');
     editForm.find('.js-note-title-entry').val(store.currentNote.title);
     editForm.find('.js-note-content-entry').val(store.currentNote.content);
+
+    const folderList = generateFolderList(store.folders, store.currentQuery);
+    $('.js-folders-list').html(folderList);
   }
 
   /**
@@ -26,7 +29,7 @@ const noteful = (function () {
       </li>`);
     return listItems.join('');
   }
-  
+
   /**
    * HELPERS
    */
