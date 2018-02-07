@@ -24,6 +24,11 @@ router.get('/notes', (req, res, next) => {
     .from('notes')
     .leftJoin('folders', 'notes.folder_id', 'folders.id')
     .where(function () {
+      if (req.query.folderId) {
+        this.where('folder_id', req.query.folderId);
+      }
+    })
+    .where(function () {
       if (searchTerm) {
         this.where('title', 'like', `%${searchTerm}%`);
       }
@@ -41,8 +46,10 @@ router.get('/notes', (req, res, next) => {
 router.get('/notes/:id', (req, res, next) => {
   const noteId = req.params.id;
 
-  knex.first('id', 'title', 'content', 'created').from('notes')
-    .where('id', noteId)
+  knex.first('notes.id', 'title', 'content', 'created', 'folder_id', 'folders.name as folder_name')
+    .from('notes')
+    .where('notes.id', noteId)
+    .leftJoin('folders', 'notes.folder_id', 'folders.id')
     .then(item => {
       if (item) {
         res.json(item);
