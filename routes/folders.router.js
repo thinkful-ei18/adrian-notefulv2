@@ -11,16 +11,16 @@ router.get('/notes', (req, res, next) => {
   knex.select('notes.id', 'title', 'content', 'folder_id', 'folders.name as folder_name')
     .from('notes')
     .leftJoin('folders', 'notes.folder_id', 'folders.id')
-    .where(function () {
-      if (searchTerm) {
-        this.where('title', 'like', `%${searchTerm}%`);
-      }
-    })
-    .orWhere(function () {
-      if (searchTerm) {
-        this.orWhere('content', 'like', `%${searchTerm}%`);
-      }
-    })
+    // .where(function () {
+    //   if (searchTerm) {
+    //     this.where('title', 'like', `%${searchTerm}%`);
+    //   }
+    // })
+    // .orWhere(function () {
+    //   if (searchTerm) {
+    //     this.orWhere('content', 'like', `%${searchTerm}%`);
+    //   }
+    // })
     .where(function () {
       if (req.query.folderId) {
         this.where('folder_id', req.query.folderId);
@@ -35,19 +35,19 @@ router.get('/notes', (req, res, next) => {
     });
 });
 
-// router.get('/notes/:id', (req, res, next) => {
-//   const noteId = req.params.id;
+router.get('/notes/:id', (req, res, next) => {
+  const noteId = req.params.id;
 
-//   knex.first('notes.id', 'notes.title', 'notes.content', 'notes.created', 'folder_id', 'folders.name as folder_name').from('notes')
-//     .where('id', noteId)
-//     .then(item => {
-//       if (item) {
-//         res.json(item);
-//       } else {
-//         next();
-//       }
-//     })
-//     .catch(err => next(err));
-// });
+  knex.first('notes.id', 'notes.title', 'notes.content', 'notes.created', 'folder_id', 'folders.name as folder_name').from('notes')
+    .where('id', noteId)
+    .then(item => {
+      if (item) {
+        res.json(item);
+      } else {
+        next();
+      }
+    })
+    .catch(err => next(err));
+});
 
 module.exports = router;
