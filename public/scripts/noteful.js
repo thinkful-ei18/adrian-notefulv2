@@ -30,6 +30,21 @@ const noteful = (function () {
     return listItems.join('');
   }
 
+  function generateFolderList(list, currQuery) {
+    const showAllItem = `
+      <li data-id="" class="js-folder-item ${!currQuery.folderId ? 'active' : ''}">
+        <a href="#" class="name js-folder-link">All</a>
+      </li>`;
+
+    const listItems = list.map(item => `
+      <li data-id="${item.id}" class="js-folder-item ${currQuery.folderId === item.id ? 'active' : ''}">
+        <a href="#" class="name js-folder-link">${item.name}</a>
+        <button class="removeBtn js-folder-delete">X</button>
+      </li>`);
+
+    return [showAllItem, listItems].join('');
+  }
+
   /**
    * HELPERS
    */
