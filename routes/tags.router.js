@@ -33,6 +33,20 @@ router.get('/tags/:id', (req, res, next) => {
 });
 
 // Delete a tag name
+// router.delete('/tags/:id', (req, res, next) => {
+//   const id = req.params.id;
+
+//   knex('tags').where('id', `${id}`)
+//     .del()
+//     .then(count => {
+//       if (count) {
+//         res.status(204).end();
+//       } else {
+//         next();
+//       }
+//     })
+//     .catch(err => next(err));
+// });
 
 // Post a tag
 
