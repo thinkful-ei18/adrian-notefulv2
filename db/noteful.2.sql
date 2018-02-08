@@ -57,9 +57,11 @@
 -- -- get all notes
 -- SELECT * FROM notes;
 
+-- DROP TABLE tags CASCADE;
+
 -- CREATE TABLE tags (
 --   id serial PRIMARY KEY,
---   name text NOT NULL
+--   name text NOT NULL UNIQUE
 -- );
 
 -- CREATE TABLE notes_tags (
@@ -69,7 +71,7 @@
 
 -- INSERT into tags (name) VALUES
 -- ('funny'), ('cute'), ('pizza'), ('weird'), ('not about cats'),
--- ('groceries'), ('education'), ('social media'), ('funny');
+-- ('groceries'), ('education'), ('social media');
 
 -- INSERT into notes_tags (note_id, tag_id) VALUES
 -- ('1000', '1'), ('1000', '7'),
@@ -80,3 +82,8 @@
 -- ('1005', '6'),
 -- ('1005', '7'), ('1005', '3'),
 -- ('1006', '8');
+
+-- SELECT title FROM notes
+-- LEFT JOIN folders ON notes.folder_id = folders.id
+-- LEFT JOIN notes_tags ON notes.id = notes_tags.note_id
+-- LEFT JOIN tags ON notes_tags.tag_id = tags.id;
