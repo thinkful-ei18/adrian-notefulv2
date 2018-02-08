@@ -49,11 +49,11 @@ router.delete('/tags/:id', (req, res, next) => {
     .catch(err => next(err));
 });
 
-// Post a tag
+// UPDATE a tag
 
 
 
-// Update tag name
+// POST a tag
 router.post('/tags', (req, res, next) => {
   const { name } = req.body;
   /***** Never trust users. Validate input *****/
