@@ -66,3 +66,11 @@
 --   note_id INTEGER NOT NULL REFERENCES notes ON DELETE CASCADE,
 --   tag_id INTEGER NOT NULL REFERENCES tags ON DELETE CASCADE
 -- );
+
+-- INSERT into tags (name) VALUES
+-- ('funny'), ('cute'), ('pizza'), ('weird'), ('not about cats'),
+-- ('groceries'), ('education'), ('social media'), ('funny');
+
+-- INSERT into notes_tags (note_id, tag_id) VALUES
+-- ('1000', '1'), ('1001', '2'), ('1002', '3'), ('1003', '4'),
+-- ('1004', '5'), ('1005', '6'), ('1005', '7'), ('1006', '8');
