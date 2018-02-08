@@ -5,6 +5,7 @@ const express = require('express');
 
 const router = express.Router();
 const knex = require('../knex');
+const { UNIQUE_VIOLATION } = require('pg-error-constants');
 
 // GET all tags
 router.get('/tags', (req, res, next) => {
@@ -32,7 +33,7 @@ router.get('/tags/:id', (req, res, next) => {
     .catch(err => next(err));
 });
 
-Delete a tag name
+// Delete a tag name
 router.delete('/tags/:id', (req, res, next) => {
   const id = req.params.id;
 
@@ -50,9 +51,34 @@ router.delete('/tags/:id', (req, res, next) => {
 
 // Post a tag
 
+
+
 // Update tag name
+router.post('/tags', (req, res, next) => {
+  const { name } = req.body;
+  /***** Never trust users. Validate input *****/
+  if (!name) {
+    const err = new Error('Missing `name` in request body');
+    err.status = 400;
+    return next(err);
+  }
 
+  const newItem = { name };
 
+  knex.insert(newItem)
+    .into('tags')
+    .returning(['id', 'name'])
+    .then(([result]) => {
+      res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
+    })
+    .catch(err => {
+      if (err.code === UNIQUE_VIOLATION && err.constraint === 'tags_name_key') {
+        err = new Error('Tags name is already taken');
+        err.status = 409;
+      }
+      next(err);
+    });
+});
 
 
 module.exports = router;

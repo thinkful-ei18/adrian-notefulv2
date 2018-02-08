@@ -74,7 +74,7 @@ router.post('/folders', (req, res, next) => {
   knex('folders')
     .insert(newFolder)
     .returning(['id', 'name'])
-    .then(result => res.json(result))
+    .then(([result]) => res.location(`${req.originalUrl}${result.id}`).status(201).json(result))
     .catch(err => next(err));
 });
 
