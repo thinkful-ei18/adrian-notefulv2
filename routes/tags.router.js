@@ -50,7 +50,7 @@ router.delete('/tags/:id', (req, res, next) => {
 });
 
 // UPDATE a tag
-router.put('/folders/:id', (req, res, next) => {
+router.put('/tags/:id', (req, res, next) => {
   const folderId = req.params.id;
   /***** Never trust users - validate input *****/
   const updateObj = {};
@@ -69,7 +69,7 @@ router.put('/folders/:id', (req, res, next) => {
     return next(err);
   }
 
-  knex('folders').where('id', `${folderId}`)
+  knex('tags').where('id', `${folderId}`)
     .update(updateObj)
     .then(folder => {
       if (folder) {
