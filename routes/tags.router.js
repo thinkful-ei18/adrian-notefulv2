@@ -71,7 +71,8 @@ router.put('/tags/:id', (req, res, next) => {
 
   knex('tags').where('id', `${folderId}`)
     .update(updateObj)
-    .then(folder => {
+    .returning((['id', 'name']))
+    .then(([folder]) => {
       if (folder) {
         res.json(folder);
       } else {

@@ -50,7 +50,8 @@ router.put('/folders/:id', (req, res, next) => {
 
   knex('folders').where('id', `${folderId}`)
     .update(updateObj)
-    .then(folder => {
+    .returning((['id', 'name']))
+    .then(([folder]) => {
       if (folder) {
         res.json(folder);
       } else {
