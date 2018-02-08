@@ -112,7 +112,7 @@ router.post('/notes', (req, res, next) => {
     .then(([id]) => {
       noteId = id;
       // Using the new id, select the new note and the folder info
-      return knex.select('notes.id', 'title', 'content', 'folders_id', 'folders.name as folder_name')
+      return knex.select('notes.id', 'title', 'content', 'folder_id', 'folders.name as folder_name')
         .from('notes')
         .leftJoin('folders', 'notes.folder_id', 'folders.id')
         .where('notes.id', noteId);
