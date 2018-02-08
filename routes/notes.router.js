@@ -20,9 +20,11 @@ const notes = simDB.initialize(data);
 router.get('/notes', (req, res, next) => {
   const searchTerm = req.query.searchTerm ? req.query.searchTerm.toLowerCase() : null;
 
-  knex.select('notes.id', 'title', 'content', 'folder_id', 'folders.name as folder_name')
+  knex.select('notes.id', 'title', 'content', 'folder_id', 'folders.name as folder_name', 'tag.id', 'tag.name as tag_name')
     .from('notes')
     .leftJoin('folders', 'notes.folder_id', 'folders.id')
+    .leftJoin('notes_tags', 'note.id', 'notes_tags.note_id')
+    .leftJoin('tags', 'tags.id', 'notes_tags.note_id')
     .where(function () {
       if (req.query.folderId) {
         this.where('folder_id', req.query.folderId);
