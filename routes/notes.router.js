@@ -1,20 +1,10 @@
 'use strict';
 
-
 const express = require('express');
-
-// Create an router instance (aka "mini-app")
-const router = express.Router();
+const Treeize = require('treeize');
 const knex = require('../knex');
 
-const Treeize = require('treeize');
-
-// TEMP: Simple In-Memory Database
-/*
-const data = require('../db/notes');
-const simDB = require('../db/simDB');
-const notes = simDB.initialize(data);
-*/
+const router = express.Router();
 
 /* ========== GET/READ ALL NOTES ========== */
 router.get('/notes', (req, res, next) => {
@@ -91,86 +81,126 @@ router.get('/notes/:id', (req, res, next) => {
 
 });
 
-/* ========== PUT/UPDATE A SINGLE ITEM ========== */
-router.put('/notes/:id', (req, res, next) => {
-  const noteId = req.params.id;
-  /***** Never trust users - validate input *****/
-  const updateObj = {};
-  const updateableFields = ['title', 'content', 'folder_id'];
+/* ========== POST/CREATE ITEM ========== */
+router.post('/notes', (req, res, next) => {
+  const { title, content, folder_id, tags } = req.body;
 
-  updateableFields.forEach(field => {
-    if (field in req.body) {
-      updateObj[field] = req.body[field];
-    }
-  });
-
-  /***** Never trust users - validate input *****/
-  if (!updateObj.title) {
+  /***** Never trust users. Validate input *****/
+  if (!req.body.title) {
     const err = new Error('Missing `title` in request body');
     err.status = 400;
     return next(err);
   }
-
-  knex('notes').where('id', `${noteId}`)
-    .update(updateObj)
-    .returning(['id', 'name'])
-    .then(([item]) => {
-      if (item) {
-        res.json(item);
-      } else {
-        next();
-      }
-    })
-    .catch(err => next(err));
-});
-
-
-// NEW POST METHOD!
-router.post('/notes', (req, res) => {
-  const { title, content, folder_id } = req.body;
 
   const newItem = {
     title: title,
     content: content,
     folder_id: folder_id
   };
-
   let noteId;
-
   knex.insert(newItem)
     .into('notes')
     .returning('id')
     .then(([id]) => {
       noteId = id;
-      // Using the new id, select the new note and the folder info
-      return knex.select('notes.id', 'title', 'content', 'folder_id', 'folders.name as folder_name')
+      const tagsInsert = tags.map(tagId => ({ note_id: noteId, tag_id: tagId }));
+      return knex.insert(tagsInsert)
+        .into('notes_tags');
+    })
+    .then(() => {
+      return knex.select('notes.id', 'title', 'content', 'folder_id',
+        'folders.name as folder_name',
+        'tags.id as tags:id', 'tags.name as tags:name')
         .from('notes')
         .leftJoin('folders', 'notes.folder_id', 'folders.id')
+        .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
+        .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
         .where('notes.id', noteId);
     })
-    .then(([result]) => {
-      res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
+    .then(result => {
+      if (result) {
+        const treeize = new Treeize();
+        treeize.grow(result);
+        const hydrated = treeize.getData();
+        res.location(`${req.originalUrl}/${result.id}`).status(201).json(hydrated[0]);
+      } else {
+        next(); // fall-through to 404 handler
+      }
     })
     .catch(err => {
       console.error(err);
     });
 });
 
+/* ========== PUT/UPDATE A SINGLE ITEM ========== */
+router.put('/notes/:id', (req, res, next) => {
+  const noteId = req.params.id;
+  const { title, content, folder_id, tags } = req.body;
+
+  /***** Never trust users. Validate input *****/
+  if (!req.body.title) {
+    const err = new Error('Missing `title` in request body');
+    err.status = 400;
+    return next(err);
+  }
+
+  const updateItem = {
+    title: title,
+    content: content,
+    folder_id: folder_id
+  };
+
+  knex('notes')
+    .update(updateItem)
+    .where('id', noteId)
+    .then(() => {
+      return knex.del()
+        .from('notes_tags')
+        .where('note_id', noteId);
+    })
+    .then(() => {
+      const tagsInsert = tags.map(tid => ({ note_id: noteId, tag_id: tid }));
+      return knex.insert(tagsInsert)
+        .into('notes_tags');
+    })
+    .then(() => {
+      return knex.select('notes.id', 'title', 'content', 'folder_id',
+        'folders.name as folder_name',
+        'tags.id as tags:id', 'tags.name as tags:name')
+        .from('notes')
+        .leftJoin('folders', 'notes.folder_id', 'folders.id')
+        .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
+        .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
+        .where('notes.id', noteId);
+    })
+    .then(result => {
+      if (result) {
+        const treeize = new Treeize();
+        treeize.grow(result);
+        const hydrated = treeize.getData();
+        res.json(hydrated[0]);
+      } else {
+        next(); // fall-through to 404 handler
+      }
+    })
+    .catch(err => {
+      console.error(err);
+    });
+});
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/notes/:id', (req, res, next) => {
-  const id = req.params.id;
-
-  knex('notes').where('id', `${id}`)
-    .del()
+  knex.del()
+    .where('id', req.params.id)
+    .from('notes')
     .then(count => {
       if (count) {
         res.status(204).end();
       } else {
-        next();
+        next(); // fall-through to 404 handler
       }
     })
-    .catch(err => next(err));
+    .catch(next);
 });
 
 module.exports = router;
