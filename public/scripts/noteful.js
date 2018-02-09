@@ -18,6 +18,9 @@ const noteful = (function () {
     $('.js-note-folder-entry').html(folderSelect);
 
     editForm.find('.js-note-folder-entry').val(store.currentNote.folder_id);
+
+    const tagsList = generateTagsList(store.tags, store.currentQuery);
+    $('.js-tags-list').html(tagsList);
   }
 
   /**
