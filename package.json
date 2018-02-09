@@ -23,5 +23,8 @@
 		"pg": "^7.4.1",
 		"pg-error-constants": "^1.0.0",
 		"treeize": "^2.1.2"
+	},
+	"devDependencies": {
+		"cross-env": "^5.1.3"
 	}
 }
