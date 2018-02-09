@@ -188,7 +188,7 @@ describe('POST /v2/notes', function () {
 });
 
 describe('PUT /v2/notes/:id', function () {
-
+// TEST WORKS.
   it('should update the note', function () {
     const updateItem = {
       'title': 'What about dogs?!',
@@ -253,10 +253,10 @@ describe('PUT /v2/notes/:id', function () {
 });
 
 describe('DELETE  /v2/notes/:id', function () {
-
-  it.only('should delete an item by id', function () {
+// TEST WORKS AND LITERALLY DELETES ITEM.
+  it('should delete an item by id', function () {
     return chai.request(app)
-      .delete('/v2/notes/1001')
+      .delete('/v2/notes/1000')
       .then(function (res) {
         expect(res).to.have.status(204);
       });
