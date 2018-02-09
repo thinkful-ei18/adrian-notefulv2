@@ -301,6 +301,33 @@ const noteful = (function () {
     });
   }
 
+  function handleTagDeleteClick() {
+    $('.js-tags-list').on('click', '.js-tag-delete', event => {
+      event.preventDefault();
+      const tagId = getTagIdFromElement(event.currentTarget);
+
+      if (tagId === store.currentQuery.tagId) {
+        store.currentQuery.tagId = null;
+      }
+
+      store.currentNote = {};
+
+      api.remove(`/v2/tags/${tagId}`)
+        .then(() => {
+          return api.search('/v2/tags');
+        })
+        .then(response => {
+          store.tags = response;
+          return api.search('/v2/notes', store.currentQuery);
+        })
+        .then(response => {
+          store.notes = response;
+          render();
+        });
+    });
+  }
+
+
   function bindEventListeners() {
     handleNoteItemClick();
     handleNoteSearchSubmit();
@@ -315,6 +342,7 @@ const noteful = (function () {
 
     handleTagClick();
     handleNewTagSubmit();
+    handleTagDeleteClick();
   }
 
   // This object contains the only exposed methods from this module:
