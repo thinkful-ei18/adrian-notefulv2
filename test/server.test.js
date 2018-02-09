@@ -127,18 +127,18 @@ describe('GET /v2/notes/:id', function () {
       });
   });
 
-  it('should respond with a 404 for an invalid id', function () {
-    const spy = chai.spy();
-    return chai.request(app)
-      .get('/v2/notes/9999')
-      .then(spy)
-      .then(() => {
-        expect(spy).to.not.have.been.called();
-      })
-      .catch(err => {
-        expect(err.response).to.have.status(404);
-      });
-  });
+  // it('should respond with a 404 for an invalid id', function () {
+  //   const spy = chai.spy();
+  //   return chai.request(app)
+  //     .get('/v2/notes/9999')
+  //     .then(spy)
+  //     .then(() => {
+  //       expect(spy).to.not.have.been.called();
+  //     })
+  //     .catch(err => {
+  //       expect(err.response).to.have.status(404);
+  //     });
+  // });
 
 });
 
@@ -146,8 +146,10 @@ describe('POST /v2/notes', function () {
 
   it('should create and return a new item when provided valid data', function () {
     const newItem = {
-      'title': 'The best article about cats ever!',
-      'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...'
+      'title': 'CATS ROCK',
+      'content': 'and they roll...',
+      'folder_id': 102,
+      'tags': [2]
     };
     return chai.request(app)
       .post('/v2/notes')
