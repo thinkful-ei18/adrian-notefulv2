@@ -21,6 +21,10 @@ const noteful = (function () {
 
     const tagsList = generateTagsList(store.tags, store.currentQuery);
     $('.js-tags-list').html(tagsList);
+
+    const tagsSelect = generateTagsSelect(store.tags);
+    $('.js-note-tags-entry').html(tagsSelect);
+
   }
 
   /**
