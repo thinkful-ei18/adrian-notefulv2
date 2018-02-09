@@ -12,8 +12,30 @@ const chaiHttp = require('chai-http');
 const chaiSpies = require('chai-spies');
 const expect = chai.expect;
 
+const knex = require('../knex');
+const seedData = require('../db/seed');
+
 chai.use(chaiHttp);
 chai.use(chaiSpies);
+
+
+before(function () {
+  // do nothing.
+});
+
+beforeEach(function (){
+  // create the database before each DESCRIBE block
+  return seedData();
+});
+
+afterEach(function (){
+  // do nothing.
+});
+
+after(function () {
+// destroy the connection
+  return knex.destroy();
+});
 
 describe('Reality check', function () {
 
