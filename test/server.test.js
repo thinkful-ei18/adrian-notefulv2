@@ -256,7 +256,7 @@ describe('DELETE  /v2/notes/:id', function () {
 
   it.only('should delete an item by id', function () {
     return chai.request(app)
-      .delete('/v2/notes/1000')
+      .delete('/v2/notes/1003')
       .then(function (res) {
         expect(res).to.have.status(204);
       });
