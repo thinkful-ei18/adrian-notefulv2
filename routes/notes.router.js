@@ -7,6 +7,8 @@ const express = require('express');
 const router = express.Router();
 const knex = require('../knex');
 
+const Treeize = require('treeize');
+
 // TEMP: Simple In-Memory Database
 /*
 const data = require('../db/notes');
@@ -17,14 +19,14 @@ const notes = simDB.initialize(data);
 // Get All (and search by query)
 /* ========== GET/READ ALL NOTES ========== */
 
-router.get('/notes', (req, res, next) => {
+router.get('/notes', (req, res) => {
   const searchTerm = req.query.searchTerm ? req.query.searchTerm.toLowerCase() : null;
 
   knex.select('notes.id', 'title', 'content', 'folder_id', 'folders.name as folder_name', 'tags.id', 'tags.name as tag_name')
     .from('notes')
     .leftJoin('folders', 'notes.folder_id', 'folders.id')
     .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
-    .leftJoin('tags', 'tags.id', 'notes_tags.note_id')
+    .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
     .where(function () {
       if (req.query.folderId) {
         this.where('folder_id', req.query.folderId);
@@ -36,8 +38,14 @@ router.get('/notes', (req, res, next) => {
       }
     })
     .orderBy('notes.id')
+    // .then(results => {
+    //   res.json(results);
+    // })
     .then(results => {
-      res.json(results);
+      const treeize = new Treeize();
+      treeize.grow(results);
+      const hydrated = treeize.getData();
+      res.json(hydrated);
     })
     .catch(err => {
       console.error(err);
@@ -48,13 +56,18 @@ router.get('/notes', (req, res, next) => {
 router.get('/notes/:id', (req, res, next) => {
   const noteId = req.params.id;
 
-  knex.first('notes.id', 'title', 'content', 'created', 'folder_id', 'folders.name as folder_name')
+  knex.select('notes.id', 'title', 'content', 'created', 'folder_id', 'folders.name as folder_name', 'tags.id', 'tags.name as tag_name')
     .from('notes')
     .where('notes.id', noteId)
     .leftJoin('folders', 'notes.folder_id', 'folders.id')
-    .then(item => {
-      if (item) {
-        res.json(item);
+    .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
+    .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
+    .then(result => {
+      if (result) {
+        const treeize = new Treeize();
+        treeize.grow(result);
+        const hydrated = treeize.getData();
+        res.json(hydrated);
       } else {
         next();
       }
@@ -97,7 +110,7 @@ router.put('/notes/:id', (req, res, next) => {
 
 
 // NEW POST METHOD!
-router.post('/notes', (req, res, next) => {
+router.post('/notes', (req, res) => {
   const { title, content, folder_id } = req.body;
 
   const newItem = {

@@ -92,17 +92,16 @@ INSERT INTO notes (title, content) VALUES
   );
 
 INSERT into notes_tags (note_id, tag_id) VALUES
-('1000', '1'), ('1000', '7'),
-('1001', '2'), ('1001', '5'),
-('1002', '3'),('1002', '4'),
+('1000', '1'),
+('1001', '2'),
+('1002', '3'),
 ('1003', '4'),
 ('1004', '5'),
 ('1005', '6'),
-('1005', '7'), ('1005', '3'),
 ('1006', '8');
 
 -- get all notes
--- SELECT * FROM notes;
+-- SELECT * FROM notes_tags;
 
 -- SELECT title FROM notes
 -- LEFT JOIN folders ON notes.folder_id = folders.id
