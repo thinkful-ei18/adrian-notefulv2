@@ -43,6 +43,7 @@ const noteful = (function () {
         <button class="removeBtn js-note-delete-button">X</button>
         <div class="metadata">
         <div class="date">${moment(item.created).calendar()}</div>
+        <div class="tags">${getTagsCommaSeparated(item.tags)}</div>
           </div>
       </li>`);
     return listItems.join('');
@@ -99,6 +100,10 @@ const noteful = (function () {
   function getFolderIdFromElement(item) {
     const id = $(item).closest('.js-folder-item').data('id');
     return id;
+  }
+
+  function getTagsCommaSeparated(tags) {
+    return tags ? tags.map(tag => tag.name).join(', ') : '';
   }
 
   /**
