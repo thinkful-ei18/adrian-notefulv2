@@ -283,7 +283,23 @@ const noteful = (function () {
     });
   }
 
+  function handleNewTagSubmit() {
+    $('.js-new-tag-form').on('submit', event => {
+      event.preventDefault();
 
+      const newTagName = $('.js-new-tag-entry').val();
+      api.create('/v2/tags', { name: newTagName })
+        .then(() => {
+          return api.search('/v2/tags');
+        }).then(response => {
+          store.tags = response;
+          render();
+        })
+        .catch(err => {
+          console.error(err);
+        });
+    });
+  }
 
   function bindEventListeners() {
     handleNoteItemClick();
@@ -298,6 +314,7 @@ const noteful = (function () {
     handleFolderDeleteClick();
 
     handleTagClick();
+    handleNewTagSubmit();
   }
 
   // This object contains the only exposed methods from this module:
