@@ -52,6 +52,7 @@ router.get('/notes', (req, res, next) => {
 
 /* ========== GET/READ SINGLE NOTES ========== */
 router.get('/notes/:id', (req, res, next) => {
+  console.log('getByID endpoint tried');
   const noteId = req.params.id;
 
   // 3 variations:
@@ -78,6 +79,7 @@ router.get('/notes/:id', (req, res, next) => {
         // console.log('result #3:', hydrated);
         res.json(hydrated[0]);
       } else {
+        console.log('should be sending 404 error');
         next(); // fall-through to 404 handler
       }
     })

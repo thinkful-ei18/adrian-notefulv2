@@ -254,9 +254,9 @@ describe('PUT /v2/notes/:id', function () {
 
 describe('DELETE  /v2/notes/:id', function () {
 
-  it('should delete an item by id', function () {
+  it.only('should delete an item by id', function () {
     return chai.request(app)
-      .delete('/v2/notes/1005')
+      .delete('/v2/notes/1000')
       .then(function (res) {
         expect(res).to.have.status(204);
       });
