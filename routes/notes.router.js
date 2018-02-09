@@ -16,31 +16,39 @@ const simDB = require('../db/simDB');
 const notes = simDB.initialize(data);
 */
 
-// Get All (and search by query)
 /* ========== GET/READ ALL NOTES ========== */
+router.get('/notes', (req, res, next) => {
+  const searchTerm = req.query.searchTerm;
+  const folderId = req.query.folderId;
+  const tagId = req.query.tagId;
 
-router.get('/notes', (req, res) => {
-  const searchTerm = req.query.searchTerm ? req.query.searchTerm.toLowerCase() : null;
-
-  knex.select('notes.id', 'title', 'content', 'folder_id', 'folders.name as folder_name', 'tags.id', 'tags.name as tag_name')
+  knex.select('notes.id', 'title', 'content', 'folder_id',
+    'folders.name as folder_name',
+    'tags.id as tags:id', 'tags.name as tags:name')
     .from('notes')
     .leftJoin('folders', 'notes.folder_id', 'folders.id')
     .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
     .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
     .where(function () {
-      if (req.query.folderId) {
-        this.where('folder_id', req.query.folderId);
-      }
-    })
-    .where(function () {
       if (searchTerm) {
         this.where('title', 'like', `%${searchTerm}%`);
       }
     })
+    .where(function () {
+      if (folderId) {
+        this.where('folder_id', folderId);
+      }
+    })
+    .where(function () {
+      if (tagId) {
+        const subQuery = knex.select('notes.id')
+          .from('notes')
+          .innerJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
+          .where('notes_tags.tag_id', tagId);
+        this.whereIn('notes.id', subQuery);
+      }
+    })
     .orderBy('notes.id')
-    // .then(results => {
-    //   res.json(results);
-    // })
     .then(results => {
       const treeize = new Treeize();
       treeize.grow(results);
@@ -56,23 +64,31 @@ router.get('/notes', (req, res) => {
 router.get('/notes/:id', (req, res, next) => {
   const noteId = req.params.id;
 
-  knex.select('notes.id', 'title', 'content', 'created', 'folder_id', 'folders.name as folder_name', 'tags.id', 'tags.name as tag_name')
+  // 3 variations:
+  //   - Array Item `res.json(result[0]);`
+  //   - Array Destructuring `.then(([result]) => {`
+  //   - Use `.first()` instead of `.select()`
+
+  knex.select('notes.id', 'title', 'content', 'folder_id',
+    'folders.name as folder_name',
+    'tags.id as tags:id', 'tags.name as tags:name')
     .from('notes')
-    .where('notes.id', noteId)
     .leftJoin('folders', 'notes.folder_id', 'folders.id')
     .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
     .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
+    .where('notes.id', noteId)
     .then(result => {
       if (result) {
         const treeize = new Treeize();
         treeize.grow(result);
         const hydrated = treeize.getData();
-        res.json(hydrated);
+        res.json(hydrated[0]);
       } else {
-        next();
+        next(); // fall-through to 404 handler
       }
     })
-    .catch(err => next(err));
+    .catch(next);
+
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
