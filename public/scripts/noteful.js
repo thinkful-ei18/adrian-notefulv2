@@ -25,6 +25,12 @@ const noteful = (function () {
     const tagsSelect = generateTagsSelect(store.tags);
     $('.js-note-tags-entry').html(tagsSelect);
 
+    editForm.find('.js-note-tags-entry').val(() => {
+      if (store.currentNote.tags) {
+        return store.currentNote.tags.map(tag => tag.id);
+      }
+    });
+
   }
 
   /**
@@ -74,6 +80,11 @@ const noteful = (function () {
         <button class="removeBtn js-tag-delete">X</button>
       </li>`);
     return [showAllItem, ...listItems].join('');
+  }
+
+  function generateTagsSelect(list) {
+    const notes = list.map(item => `<option value="${item.id}">${item.name}</option>`);
+    return notes.join('');
   }
 
 
