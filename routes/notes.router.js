@@ -69,9 +69,13 @@ router.get('/notes/:id', (req, res, next) => {
     .where('notes.id', noteId)
     .then(result => {
       if (result) {
+        console.log('result #1:', result);
         const treeize = new Treeize();
+        // console.log('result #2:', treeize);
         treeize.grow(result);
+        console.log('result #2:', treeize.grow(result));
         const hydrated = treeize.getData();
+        console.log('result #3:', hydrated);
         res.json(hydrated[0]);
       } else {
         next(); // fall-through to 404 handler
@@ -122,7 +126,7 @@ router.post('/notes', (req, res, next) => {
         const treeize = new Treeize();
         treeize.grow(result);
         const hydrated = treeize.getData();
-        res.location(`${req.originalUrl}/${result.id}`).status(201).json(hydrated[0]);
+        res.location(`${req.originalUrl}/${noteId}`).status(201).json(hydrated[0]);
       } else {
         next(); // fall-through to 404 handler
       }
