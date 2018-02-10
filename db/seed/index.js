@@ -27,7 +27,7 @@ function seedDataNotesTags() {
 }
 
 function seedData() {
-  return Promise.all([seedDataFolders(), seedDataTags()])
+  return Promise.all([seedDataTags(), seedDataFolders()])
     .then(() => seedDataNotes())
     .then(() => seedDataNotesTags());
 }
