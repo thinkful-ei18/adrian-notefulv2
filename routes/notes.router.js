@@ -46,7 +46,7 @@ router.get('/notes', (req, res, next) => {
       res.json(hydrated);
     })
     .catch(err => {
-      console.error(err);
+      next(err);
     });
 });
 
@@ -135,7 +135,7 @@ router.post('/notes', (req, res, next) => {
       }
     })
     .catch(err => {
-      console.error(err);
+      next(err);
     });
 });
 
@@ -191,13 +191,13 @@ router.put('/notes/:id', (req, res, next) => {
               const hydrated = treeize.getData();
               res.json(hydrated[0]);
             }
-          })
+          });
       } else {
         next();
       }
     })
     .catch(err => {
-      console.error(err);
+      next(err);
     });
 });
 

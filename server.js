@@ -30,7 +30,7 @@ app.use('/v2', tagsRouter);
 
 // Catch-all 404
 app.use(function (req, res, next) {
-  console.log('404 error ran');
+  // console.log('404 error ran');
   const err = new Error('Not Found');
   err.status = 404;
   next(err);
@@ -38,8 +38,8 @@ app.use(function (req, res, next) {
 
 // Catch-all Error handler
 // Add NODE_ENV check to prevent stacktrace leak
-app.use(function (err, req, res, next) {
-  console.log('error handler ran');
+app.use(function (err, req, res) {
+  // console.log('error handler ran');
   res.status(err.status || 500);
   res.json({
     message: err.message,
