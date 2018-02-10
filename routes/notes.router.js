@@ -52,9 +52,9 @@ router.get('/notes', (req, res, next) => {
 
 /* ========== GET/READ SINGLE NOTES ========== */
 router.get('/notes/:id', (req, res, next) => {
-  console.log('getByID endpoint tried');
+  // console.log('getByID endpoint tried');
   const noteId = req.params.id;
-  console.log(noteId);
+  // console.log(noteId);
   // 3 variations:
   //   - Array Item `res.json(result[0]);`
   //   - Array Destructuring `.then(([result]) => {`
@@ -80,7 +80,7 @@ router.get('/notes/:id', (req, res, next) => {
         // console.log('result #3:', hydrated);
         res.json(hydrated[0]);
       } else {
-        console.log('should be sending 404 error');
+        // console.log('should be sending 404 error');
         next(); // fall-through to 404 handler
       }
     })
