@@ -157,43 +157,50 @@ router.put('/notes/:id', (req, res, next) => {
     folder_id: folder_id
   };
 
-  knex('notes')
-    .update(updateItem)
-    .where('id', noteId)
-    .then(() => {
-      return knex.del()
-        .from('notes_tags')
-        .where('note_id', noteId);
-    })
-    .then(() => {
-      const tagsInsert = tags.map(tid => ({ note_id: noteId, tag_id: tid }));
-      return knex.insert(tagsInsert)
-        .into('notes_tags');
-    })
-    .then(() => {
-      return knex.select('notes.id', 'title', 'content', 'folder_id',
-        'folders.name as folder_name',
-        'tags.id as tags:id', 'tags.name as tags:name')
-        .from('notes')
-        .leftJoin('folders', 'notes.folder_id', 'folders.id')
-        .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
-        .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
-        .where('notes.id', noteId);
-    })
+  knex('notes.id').from('notes')
+    .where('notes.id', noteId)
     .then(result => {
-      if (result) {
-        const treeize = new Treeize();
-        treeize.grow(result);
-        const hydrated = treeize.getData();
-        res.json(hydrated[0]);
+      if (result && result.length > 0) {
+        knex('notes')
+          .update(updateItem)
+          .where('id', noteId)
+          .then(() => {
+            return knex.del()
+              .from('notes_tags')
+              .where('note_id', noteId);
+          })
+          .then(() => {
+            const tagsInsert = tags.map(tid => ({ note_id: noteId, tag_id: tid }));
+            return knex.insert(tagsInsert)
+              .into('notes_tags');
+          })
+          .then(() => {
+            return knex.select('notes.id', 'title', 'content', 'folder_id',
+              'folders.name as folder_name',
+              'tags.id as tags:id', 'tags.name as tags:name')
+              .from('notes')
+              .leftJoin('folders', 'notes.folder_id', 'folders.id')
+              .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
+              .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
+              .where('notes.id', noteId);
+          })
+          .then(result => {
+            if (result) {
+              const treeize = new Treeize();
+              treeize.grow(result);
+              const hydrated = treeize.getData();
+              res.json(hydrated[0]);
+            }
+          })
       } else {
-        next(); // fall-through to 404 handler
+        next();
       }
     })
     .catch(err => {
       console.error(err);
     });
 });
+
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/notes/:id', (req, res, next) => {

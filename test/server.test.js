@@ -159,7 +159,7 @@ describe('GET /v2/notes/:id', function () {
       });
   });
 
-  it.only('should respond with a 404 for an invalid id', function () {
+  it('should respond with a 404 for an invalid id', function () {
     const spy = chai.spy();
     return chai.request(app)
       .get('/v2/notes/9999')
@@ -244,24 +244,24 @@ describe('PUT /v2/notes/:id', function () {
       });
   });
 
-  // it('should respond with a 404 for an invalid id', function () {
-  //   const updateItem = {
-  //     'title': 'What about dogs?!',
-  //     'content': 'woof woof',
-  //     'tags': [2]
-  //   };
-  //   const spy = chai.spy();
-  //   return chai.request(app)
-  //     .put('/v2/notes/1099')
-  //     .send(updateItem)
-  //     .then(spy)
-  //     .then(() => {
-  //       expect(spy).to.not.have.been.called();
-  //     })
-  //     .catch(err => {
-  //       expect(err.response).to.have.status(404);
-  //     });
-  // });
+  it('should respond with a 404 for an invalid id', function () {
+    const updateItem = {
+      'title': 'What about dogs?!',
+      'content': 'woof woof',
+      'tags': [2]
+    };
+    const spy = chai.spy();
+    return chai.request(app)
+      .put('/v2/notes/1099')
+      .send(updateItem)
+      .then(spy)
+      .then(() => {
+        expect(spy).to.not.have.been.called();
+      })
+      .catch(err => {
+        expect(err.response).to.have.status(404);
+      });
+  });
 
   it('should return an error when missing "title" field', function () {
     const updateItem = {
