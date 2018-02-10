@@ -54,7 +54,7 @@ router.get('/notes', (req, res, next) => {
 router.get('/notes/:id', (req, res, next) => {
   console.log('getByID endpoint tried');
   const noteId = req.params.id;
-
+  console.log(noteId);
   // 3 variations:
   //   - Array Item `res.json(result[0]);`
   //   - Array Destructuring `.then(([result]) => {`
@@ -69,7 +69,8 @@ router.get('/notes/:id', (req, res, next) => {
     .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
     .where('notes.id', noteId)
     .then(result => {
-      if (result) {
+      // console.log(result);
+      if (result && result.length > 0) {
         // console.log('result #1:', result);
         const treeize = new Treeize();
         // console.log('result #2:', treeize);
